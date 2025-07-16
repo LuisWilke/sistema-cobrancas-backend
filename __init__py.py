@@ -20,8 +20,8 @@ def create_app():
     jwt.init_app(app)
     CORS(app)
 
-    from app.routes.auth_routes import auth_bp
-    from app.routes.profile_routes import profile_bp
+    from routes.auth_routes import auth_bp
+    from routes.profile_routes import profile_bp
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(profile_bp, url_prefix="/profile")
