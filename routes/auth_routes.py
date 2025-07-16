@@ -1,21 +1,28 @@
 from flask import Blueprint, request, jsonify
-from models.usuario import Usuario
-from database import db
-from passlib.hash import bcrypt
+from app.models import db, User
 from flask_jwt_extended import create_access_token
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/api')
+auth_bp = Blueprint('auth_bp', __name__)
+
+@auth_bp.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    if User.query.filter_by(username=data['username']).first():
+        return jsonify({'error': 'Usuário já existe'}), 409
+
+    user = User(username=data['username'])
+    user.set_password(data['password'])
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({'message': 'Usuário criado com sucesso'}), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    dados = request.json
-    email = dados.get('email')
-    senha = dados.get('senha')
+    data = request.get_json()
+    user = User.query.filter_by(username=data['username']).first()
+    if user and user.check_password(data['password']):
+        access_token = create_access_token(identity=user.id)
+        return jsonify({'access_token': access_token}), 200
 
-    usuario = Usuario.query.filter_by(email=email).first()
-
-    if usuario and bcrypt.verify(senha, usuario.senha):
-        token = create_access_token(identity=usuario.gid)
-        return jsonify({'token': token, 'nome': usuario.nome})
-    
-    return jsonify({'erro': 'Credenciais inválidas'}), 401
+    return jsonify({'error': 'Credenciais inválidas'}), 401

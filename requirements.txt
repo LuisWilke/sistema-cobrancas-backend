@@ -1,8 +1,7 @@
-flask
-flask-cors
-flask-sqlalchemy
-flask-jwt-extended
-passlib
+Flask
+flask_sqlalchemy
+flask_cors
+flask_bcrypt
+flask_jwt_extended
+python-dotenv
 psycopg2-binary
-pytest
-pytest-flask
