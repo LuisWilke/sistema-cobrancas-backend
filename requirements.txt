@@ -6,4 +6,3 @@ passlib
 psycopg2-binary
 pytest
 pytest-flask
-flask_bcrypt

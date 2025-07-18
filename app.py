@@ -14,9 +14,11 @@ def create_app():
     # Configurar CORS para permitir requisições do frontend
     CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
     
+    # Inicializar extensões
     db.init_app(app)
     jwt = JWTManager(app)
 
+    # Registro de Blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(cliente_bp)
 

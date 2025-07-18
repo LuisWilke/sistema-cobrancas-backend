@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Script para inicializar o banco de dados
+"""
+
 from app import create_app
 from database import db
 from models.usuario import Usuario
