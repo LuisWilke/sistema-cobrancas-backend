@@ -1,15 +1,9 @@
-from datetime import datetime
-from flask import Blueprint, Flask, request, jsonify
-from models.empresa import Empresa
+from flask import Blueprint, request, jsonify
 from models.usuario import Usuario
 from database import db
 from passlib.hash import bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import re
-from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
@@ -22,7 +16,8 @@ def validar_senha(senha):
     """Valida se a senha tem pelo menos 6 caracteres"""
     return len(senha) >= 6
 
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route('/registro', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])  # Alias para compatibilidade com frontend
 def registro():
     try:
         dados = request.json
@@ -32,16 +27,9 @@ def registro():
         senha = dados.get('senha', '')
         nome = dados.get('nome', '').strip()
         cpf_usuario = dados.get('cpf_usuario', '').strip()
-        celular = dados.get('celular', '').strip()
-        data_nascimento = dados.get('data_nascimento')
-        gid_empresa = dados.get('gid_empresa')
-        cnpj_empresa = dados.get('cnpj_empresa', '').strip()
         
         if not email or not senha or not nome:
             return jsonify({'erro': 'Email, senha e nome são obrigatórios'}), 400
-        
-        if not gid_empresa:
-            return jsonify({'erro': 'Empresa é obrigatória'}), 400
         
         # Validar formato do email
         if not validar_email(email):
@@ -56,19 +44,6 @@ def registro():
         if usuario_existente:
             return jsonify({'erro': 'Email já cadastrado'}), 409
         
-        # Verificar se a empresa existe
-        empresa = Empresa.query.get(gid_empresa)
-        if not empresa:
-            return jsonify({'erro': 'Empresa não encontrada'}), 404
-        
-        # Converter data_nascimento se fornecida
-        data_nasc_obj = None
-        if data_nascimento:
-            try:
-                data_nasc_obj = datetime.strptime(data_nascimento, '%Y-%m-%d').date()
-            except ValueError:
-                return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD'}), 400
-        
         # Criar hash da senha
         senha_hash = bcrypt.hash(senha)
         
@@ -77,11 +52,7 @@ def registro():
             email=email,
             senha=senha_hash,
             nome=nome,
-            cpf_usuario=cpf_usuario,
-            celular=celular,
-            data_nascimento=data_nasc_obj,
-            gid_empresa=gid_empresa,
-            cnpj_empresa=cnpj_empresa
+            cpf_usuario=cpf_usuario
         )
         
         db.session.add(novo_usuario)
@@ -93,7 +64,11 @@ def registro():
         return jsonify({
             'mensagem': 'Usuário criado com sucesso',
             'token': token,
-            'usuario': novo_usuario.to_dict()
+            'usuario': {
+                'id': novo_usuario.gid,
+                'nome': novo_usuario.nome,
+                'email': novo_usuario.email
+            }
         }), 201
         
     except Exception as e:
