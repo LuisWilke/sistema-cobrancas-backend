@@ -2,6 +2,8 @@
 from app import create_app
 from database import db
 from models.usuario import Usuario
+from models.empresa import Empresa
+from models.cliente import Cliente
 
 def init_database():
     """Inicializa o banco de dados criando todas as tabelas"""
@@ -28,4 +30,5 @@ def init_database():
 
 if __name__ == "__main__":
     init_database()
+
 

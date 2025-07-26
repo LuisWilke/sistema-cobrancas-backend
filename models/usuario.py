@@ -17,8 +17,8 @@ class Usuario(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # Relacionamento com empresa
-    empresa = db.relationship('Empresa', backref='usuarios')
+    # Relacionamento com empresa (removido temporariamente)
+    # empresa = db.relationship('Empresa', backref='usuarios')
 
     def __repr__(self):
         return f'<Usuario {self.email}>'

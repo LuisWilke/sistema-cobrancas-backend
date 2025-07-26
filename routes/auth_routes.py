@@ -52,7 +52,8 @@ def registro():
             email=email,
             senha=senha_hash,
             nome=nome,
-            cpf_usuario=cpf_usuario
+            cpf_usuario=cpf_usuario,
+            gid_empresa=1  # Empresa padrão (ID correto)
         )
         
         db.session.add(novo_usuario)
@@ -73,6 +74,7 @@ def registro():
         
     except Exception as e:
         db.session.rollback()
+        print(f"Erro no registro: {str(e)}")  # Log para debug
         return jsonify({'erro': 'Erro interno do servidor'}), 500
 
 @auth_bp.route('/login', methods=['POST'])

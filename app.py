@@ -6,6 +6,11 @@ from database import db
 from routes.auth_routes import auth_bp
 from routes.cliente_routes import cliente_bp
 
+# Importar todos os modelos para garantir que sejam registrados
+from models.usuario import Usuario
+from models.empresa import Empresa
+from models.cliente import Cliente
+
 
 def create_app():
     app = Flask(__name__)
